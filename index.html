@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escuela República de Nicaragua - Registro Académico 2026</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+      margin: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1050px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin: 0 auto;
+    }
+    .header-title {
+      text-align: center;
+      color: #1a365d;
+      margin-bottom: 15px;
+      border-bottom: 3px solid #2b6cb0;
+      padding-bottom: 10px;
+    }
+    .grade-range-note {
+      background-color: #ebf8ff;
+      border-left: 4px solid #3182ce;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      font-size: 0.95em;
+      color: #2b6cb0;
+      text-align: center;
+    }
+    .tag-honor {
+      background-color: #c6f6d5;
+      color: #22543d;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .tag-distinguido {
+      background-color: #bee3f8;
+      color: #2b6cb0;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+    }
+    .form-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      background-color: #edf2f7;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 0.9em;
+      color: #2d3748;
+    }
+    .form-group input, .form-group select {
+      padding: 9px;
+      border: 1px solid #cbd5e0;
+      border-radius: 5px;
+      font-size: 0.95em;
+    }
+    .add-student-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .add-student-box input {
+      flex: 1;
+      padding: 9px;
+      border: 1px solid #cbd5e0;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #2b6cb0;
+      color: white;
+    }
+    .student-name {
+      text-align: left;
+      font-weight: 600;
+    }
+    .row-honor { background-color: #c6f6d5 !important; }
+    .row-distinguido { background-color: #bee3f8 !important; }
+    
+    .summary-box {
+      margin-top: 25px;
+      padding: 18px;
+      background-color: #edf2f7;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-around;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .btn-container {
+      margin-top: 25px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      transition: background 0.2s;
+    }
+    .btn-send { background-color: #2f855a; }
+    .btn-preview { background-color: #dd6b20; }
+    .btn-print { background-color: #3182ce; }
+    .btn-download { background-color: #805ad5; }
+    .btn-add { background-color: #319795; }
+    .btn-remove { background-color: #e53e3e; padding: 4px 8px; font-size: 0.8em; }
+    button:hover { opacity: 0.9; }
+
+    #statusMessage {
+      font-weight: bold;
+      color: #2f855a;
+      display: none;
+      margin-top: 15px;
+      text-align: center;
+      font-size: 1.2em;
+    }
+
+    /* Modal de Previsualización */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .close-modal {
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printableArea, #printableArea * { visibility: visible; }
+      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="printableArea">
+  <div class="top-bar no-print">
+    <button type="button" class="btn-download" onclick="downloadCSV()">AÑO 2026</button>
+  </div>
+
+  <h1 class="header-title">Escuela República de Nicaragua</h1>
+  
+  <!-- Nota Visible de Rango de Calificaciones -->
+  <div class="grade-range-note">
+    <strong>Rango de Calificaciones:</strong> 
+    <span class="tag-honor">Puntaje Cuadro de Honor (5.00 - 4.50)</span> | 
+    <span class="tag-distinguido">Cuadro Distinguido (4.49 - 4.00)</span>
+  </div>
+
+  <form id="academicForm">
+    <div class="form-header">
+      <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" required>
+      </div>
+      <div class="form-group">
+        <label for="grado">Grado:</label>
+        <select id="grado" required>
+          <option value="">Seleccione...</option>
+          <option value="1°">1°</option>
+          <option value="2°">2°</option>
+          <option value="3°">3°</option>
+          <option value="4°">4°</option>
+          <option value="5°">5°</option>
+          <option value="6°">6°</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="grupo">Grupo:</label>
+        <select id="grupo" required>
+          <option value="">Seleccione...</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="E">E</option>
+          <option value="F">F</option>
+          <option value="G">G</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="trimestre">Trimestre:</label>
+        <select id="trimestre" required>
+          <option value="">Seleccione...</option>
+          <option value="1er Trimestre">1er Trimestre</option>
+          <option value="2do Trimestre">2do Trimestre</option>
+          <option value="3er Trimestre">3er Trimestre</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column: span 2;">
+        <label for="docente">Docente:</label>
+        <select id="docente" required>
+          <option value="">Seleccione Docente...</option>
+          <option value="DOCENTE NUEVO">DOCENTE NUEVO</option>
+          <option value="ZUIRIS DE MERCADO">ZUIRIS DE MERCADO</option>
+          <option value="MARITZA WEST">MARITZA WEST</option>
+          <option value="YAJAIRA DOWNER">YAJAIRA DOWNER</option>
+          <option value="LUZMILA PARDO">LUZMILA PARDO</option>
+          <option value="VIELKA LOU">VIELKA LOU</option>
+          <option value="DAVES MARTINEZ">DAVES MARTINEZ</option>
+          <option value="MIRIAM HUMPRHIES">MIRIAM HUMPRHIES</option>
+          <option value="MONICA SMITH">MONICA SMITH</option>
+          <option value="SALINDA BROWN">SALINDA BROWN</option>
+          <option value="ELLEANNE LANGE">ELLEANNE LANGE</option>
+          <option value="JAQUELINE MILTON">JAQUELINE MILTON</option>
+          <option value="DIANELSA RODRIGUEZ">DIANELSA RODRIGUEZ</option>
+          <option value="AURELIA DE MORALES">AURELIA DE MORALES</option>
+          <option value="IRIS FERNANDEZ">IRIS FERNANDEZ</option>
+          <option value="MABELIN ORTIZ">MABELIN ORTIZ</option>
+          <option value="YIZA PITTI">YIZA PITTI</option>
+          <option value="MIRIAM BARRIA">MIRIAM BARRIA</option>
+          <option value="REGINA GARCIA">REGINA GARCIA</option>
+          <option value="LISANDRO BLANDFORD">LISANDRO BLANDFORD</option>
+          <option value="SECUNDINA SANCHEZ">SECUNDINA SANCHEZ</option>
+          <option value="ILKA DE ANDERSON">ILKA DE ANDERSON</option>
+          <option value="LUZMILA RODRIGUEZ">LUZMILA RODRIGUEZ</option>
+          <option value="YAMILETH PINZON">YAMILETH PINZON</option>
+          <option value="MARIBEL GRIMAS">MARIBEL GRIMAS</option>
+          <option value="ELIZEL DUARTE">ELIZEL DUARTE</option>
+          <option value="LYDA THOMAS">LYDA THOMAS</option>
+          <option value="ALICIA ROOK">ALICIA ROOK</option>
+          <option value="MARIBEL DUNN">MARIBEL DUNN</option>
+          <option value="HECTOR HERNANDEZ">HECTOR HERNANDEZ</option>
+          <option value="AIDA SAMMS">AIDA SAMMS</option>
+          <option value="YIMENA SAMUDIO">YIMENA SAMUDIO</option>
+          <option value="YENISE JUAREZ">YENISE JUAREZ</option>
+          <option value="NAIRA RECORD">NAIRA RECORD</option>
+          <option value="ANAYANSI SERRUTT">ANAYANSI SERRUTT</option>
+          <option value="LIDA MENDEZ">LIDA MENDEZ</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Agregar Estudiante -->
+    <div class="add-student-box no-print">
+      <input type="text" id="newStudentName" placeholder="Nombre completo del nuevo estudiante...">
+      <button type="button" class="btn-add" onclick="addStudent()">+ Agregar Estudiante</button>
+    </div>
+
+    <!-- Lista de Estudiantes -->
+    <table>
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Estudiante</th>
+          <th>Cuadro Honor</th>
+          <th>Prom. Honor</th>
+          <th>Cuadro Distinguido</th>
+          <th>Prom. Distinguido</th>
+          <th class="no-print">Acción</th>
+        </tr>
+      </thead>
+      <tbody id="studentTableBody"></tbody>
+    </table>
+
+    <!-- Totales -->
+    <div class="summary-box">
+      <div>Total Cuadro de Honor: <span id="totalHonor">0</span></div>
+      <div>Total Cuadro Distinguidos: <span id="totalDistinguidos">0</span></div>
+    </div>
+
+    <!-- Botones -->
+    <div class="btn-container no-print">
+      <button type="button" class="btn-preview" onclick="openPreview()">Previsualizar Ordenado</button>
+      <button type="button" class="btn-print" onclick="window.print()">Imprimir</button>
+      <button type="submit" class="btn-send">Enviar a Google Sheets</button>
+    </div>
+
+    <div id="statusMessage">Enviado exitosamente</div>
+  </form>
+</div>
+
+<!-- Modal Previsualización -->
+<div id="previewModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closePreview()">&times;</span>
+    <h2>Previsualización Ordenada (Mayor a Menor)</h2>
+    <h3>Cuadro de Honor (1°, 2° y 3°)</h3>
+    <table id="honorPreviewTable">
+      <thead><tr><th>Posición</th><th>Estudiante</th><th>Promedio</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <h3>Cuadro Distinguidos (1° al 25°)</h3>
+    <table id="distPreviewTable">
+      <thead><tr><th>Posición</th><th>Estudiante</th><th>Promedio</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIDECfgPhj4pTTYrWcMZnVyTeGN15G1kgp974O_LpVpZu-nHIzBEyIgasPAOAsB8SF3Q/exec';
+
+  let estudiantes = JSON.parse(localStorage.getItem('estudiantes_nicaragua')) || [
+    "Alvarado, Juan", "Bermúdez, María", "Castillo, Carlos", "Díaz, Ana"
+  ];
+
+  document.getElementById('fecha').valueAsDate = new Date();
+
+  function saveAndRender() {
+    localStorage.setItem('estudiantes_nicaragua', JSON.stringify(estudiantes));
+    renderTable();
+  }
+
+  function renderTable() {
+    const tableBody = document.getElementById('studentTableBody');
+    tableBody.innerHTML = '';
+
+    let distOptions = '<option value="">Ninguno</option>';
+    for (let i = 1; i <= 25; i++) {
+      distOptions += `<option value="Distinguidos ${i}">Distinguidos ${i}°</option>`;
+    }
+
+    estudiantes.forEach((nombre, index) => {
+      const row = document.createElement('tr');
+      row.id = `row-${index}`;
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td class="student-name">${nombre}</td>
+        <td>
+          <select onchange="updateRowColor(${index})" id="honor-${index}">
+            <option value="">Ninguno</option>
+            <option value="Honor 1">Honor 1°</option>
+            <option value="Honor 2">Honor 2°</option>
+            <option value="Honor 3">Honor 3°</option>
+          </select>
+        </td>
+        <td><input type="number" step="0.01" min="4.50" max="5.00" id="promHonor-${index}" placeholder="0.00" onblur="formatDecimal(this)"></td>
+        <td>
+          <select onchange="updateRowColor(${index})" id="dist-${index}">
+            ${distOptions}
+          </select>
+        </td>
+        <td><input type="number" step="0.01" min="4.00" max="4.49" id="promDist-${index}" placeholder="0.00" onblur="formatDecimal(this)"></td>
+        <td class="no-print">
+          <button type="button" class="btn-remove" onclick="removeStudent(${index})">X</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+    calculateTotals();
+  }
+
+  function addStudent() {
+    const input = document.getElementById('newStudentName');
+    if (input.value.trim() !== "") {
+      estudiantes.push(input.value.trim());
+      input.value = "";
+      saveAndRender();
+    }
+  }
+
+  function removeStudent(index) {
+    estudiantes.splice(index, 1);
+    saveAndRender();
+  }
+
+  function updateRowColor(index) {
+    const honor = document.getElementById(`honor-${index}`).value;
+    const dist = document.getElementById(`dist-${index}`).value;
+    const row = document.getElementById(`row-${index}`);
+    row.className = '';
+    if (honor !== "") row.classList.add('row-honor');
+    else if (dist !== "") row.classList.add('row-distinguido');
+    calculateTotals();
+  }
+
+  function calculateTotals() {
+    let honorCount = 0, distCount = 0;
+    estudiantes.forEach((_, i) => {
+      if (document.getElementById(`honor-${i}`).value !== "") honorCount++;
+      if (document.getElementById(`dist-${i}`).value !== "") distCount++;
+    });
+    document.getElementById('totalHonor').innerText = honorCount;
+    document.getElementById('totalDistinguidos').innerText = distCount;
+  }
+
+  function formatDecimal(input) {
+    if (input.value) input.value = parseFloat(input.value).toFixed(2);
+  }
+
+  function openPreview() {
+    const honorList = [], distList = [];
+
+    estudiantes.forEach((nombre, i) => {
+      const honor = document.getElementById(`honor-${i}`).value;
+      const promHonor = parseFloat(document.getElementById(`promHonor-${i}`).value) || 0;
+      const dist = document.getElementById(`dist-${i}`).value;
+      const promDist = parseFloat(document.getElementById(`promDist-${i}`).value) || 0;
+
+      if (honor !== "") honorList.push({ nombre, pos: honor, prom: promHonor });
+      if (dist !== "") distList.push({ nombre, pos: dist, prom: promDist });
+    });
+
+    honorList.sort((a, b) => b.prom - a.prom);
+    distList.sort((a, b) => b.prom - a.prom);
+
+    const honorBody = document.querySelector('#honorPreviewTable tbody');
+    honorBody.innerHTML = honorList.map(item => `<tr><td>${item.pos}</td><td>${item.nombre}</td><td>${item.prom.toFixed(2)}</td></tr>`).join('');
+
+    const distBody = document.querySelector('#distPreviewTable tbody');
+    distBody.innerHTML = distList.map(item => `<tr><td>${item.pos}</td><td>${item.nombre}</td><td>${item.prom.toFixed(2)}</td></tr>`).join('');
+
+    document.getElementById('previewModal').style.display = 'block';
+  }
+
+  function closePreview() {
+    document.getElementById('previewModal').style.display = 'none';
+  }
+
+  document.getElementById('academicForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const grado = document.getElementById('grado').value;
+    const grupo = document.getElementById('grupo').value;
+    const docente = document.getElementById('docente').value;
+    const fecha = document.getElementById('fecha').value;
+    const trimestre = document.getElementById('trimestre').value;
+
+    const listaAlumnos = estudiantes.map((nombre, i) => ({
+      nombre: nombre,
+      honor: document.getElementById(`honor-${i}`).value,
+      promHonor: parseFloat(document.getElementById(`promHonor-${i}`).value) || 0,
+      distinguido: document.getElementById(`dist-${i}`).value,
+      promDistinguido: parseFloat(document.getElementById(`promDist-${i}`).value) || 0
+    }));
+
+    listaAlumnos.sort((a, b) => Math.max(b.promHonor, b.promDistinguido) - Math.max(a.promHonor, a.promDistinguido));
+
+    const payload = {
+      fecha: fecha,
+      docente: docente,
+      grado: grado,
+      grupo: grupo,
+      trimestre: trimestre,
+      pestaña: `${grado}${grupo}`,
+      estudiantes: listaAlumnos
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(() => {
+      const statusMsg = document.getElementById('statusMessage');
+      statusMsg.style.display = 'block';
+      statusMsg.innerText = 'Enviado exitosamente';
+    }).catch(err => {
+      console.error(err);
+      alert('Error al enviar los datos a Google Sheets.');
+    });
+  });
+
+  function downloadCSV() {
+    let csv = `Nombre,Cuadro de honor,Puntaje,Cuadro distinguido,Puntaje\n`;
+
+    const lista = estudiantes.map((nombre, i) => ({
+      nombre,
+      honor: document.getElementById(`honor-${i}`).value,
+      promHonor: document.getElementById(`promHonor-${i}`).value || '0.00',
+      dist: document.getElementById(`dist-${i}`).value,
+      promDist: document.getElementById(`promDist-${i}`).value || '0.00',
+      maxProm: Math.max(
+        parseFloat(document.getElementById(`promHonor-${i}`).value) || 0,
+        parseFloat(document.getElementById(`promDist-${i}`).value) || 0
+      )
+    }));
+
+    lista.sort((a, b) => b.maxProm - a.maxProm);
+
+    lista.forEach(item => {
+      csv += `"${item.nombre}","${item.honor}",${item.promHonor},"${item.dist}",${item.promDist}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Reporte_2026_${document.getElementById('grado').value}${document.getElementById('grupo').value}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  renderTable();
+</script>
+
+</body>
+</html>
